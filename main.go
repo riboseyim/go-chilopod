@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	openzipkin "github.com/openzipkin/zipkin-go"
 	"github.com/openzipkin/zipkin-go/reporter/http"
@@ -26,6 +28,18 @@ func main() {
 	task := flag.String("t", "", "[ping | snmp | ssh | all ].eg")
 	//配置文件
 	cfgfile := flag.String("cfg", "", "")
+
+	if *model == "" {
+		fmt.Println("Please specify either  model ....")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	if *task == "" {
+		fmt.Println("Please specify either  task ....")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
 
 	flag.Parse()
 	log.Printf("Welcome to [ Chilopod System %s ] \n Author:%s \n\n", VERSION, AUTHOR)
