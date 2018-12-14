@@ -10,6 +10,7 @@ import (
 	openzipkin "github.com/openzipkin/zipkin-go"
 	"github.com/openzipkin/zipkin-go/reporter/http"
 	chilopod_net "github.com/riboseyim/go-chilopod/network"
+	chilopod_porter "github.com/riboseyim/go-chilopod/porter"
 	"go.opencensus.io/exporter/zipkin"
 	"go.opencensus.io/trace"
 )
@@ -23,9 +24,9 @@ const (
 
 func main() {
 	//模式：listener|监听捕捉，probe|主动探测
-	model := flag.String("m", "", "[listener | probe  ].eg")
+	model := flag.String("m", "model", "[listener | probe  ].eg")
 	//任务：
-	task := flag.String("t", "", "[ping | snmp | ssh | all ].eg")
+	task := flag.String("t", "task", "[ping | snmp | ssh | all ].eg")
 	//配置文件
 	cfgfile := flag.String("cfg", "", "")
 
@@ -79,7 +80,8 @@ func new_task(ctx context.Context, model string, task string, cfgfile string) {
 		} else if task == "snmp" {
 			chilopod_net.Exec_snmp_task(ctx, cfgfile)
 		} else if task == "ssh" {
-		} else if task == "all" {
+		} else if task == "porter-backup-cfg" {
+			chilopod_porter.Exec_backup_task(ctx, cfgfile)
 		} else {
 			log.Println("cannot found this taskId:[%s]", task)
 		}
