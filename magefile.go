@@ -15,7 +15,8 @@ import (
 
 func init() {
 	// ProjectName
-	os.Setenv("MATTEL_REPO", "Chilopod")
+	os.Setenv("MATTEL_REPO", "go-chilopod")
+	os.Setenv("TAG", "v0.1.2")
 }
 
 // Default target to run when none is specified
@@ -32,7 +33,6 @@ func Build_v1() error {
 
 func Build() error {
 	mg.Deps(Dep)
-	//return sh.RunV("go", "build", "-o", "project", "-ldflags="+ldflags(), "github.com/Mattel/project")
 	return sh.RunV("go", "build", "-o", "$MATTEL_REPO", "-ldflags="+ldflags(), "github.com/riboseyim/$MATTEL_REPO")
 }
 
@@ -63,12 +63,10 @@ func Clean() {
 }
 
 func Tools() error {
-	mg.Deps(checkProtoc)
+	//mg.Deps(Protoc)
 
-	update, err := envBool("UPDATE")
-	if err != nil {
-		return err
-	}
+	update := envBool("UPDATE")
+
 	retool := "github.com/twitchtv/retool"
 
 	args := []string{"get", retool}
@@ -98,13 +96,15 @@ func Release() (err error) {
 	if err := sh.RunV("git", "push", "origin", "$TAG"); err != nil {
 		return err
 	}
+
 	defer func() {
 		if err != nil {
 			sh.RunV("git", "tag", "--delete", "$TAG")
 			sh.RunV("git", "push", "--delete", "origin", "$TAG")
 		}
 	}()
-	return retool("goreleaser")
+	return sh.RunV("goreleaser", "release", "--skip-publish")
+	//return retool("goreleaser")
 }
 
 func ldflags() string {
@@ -114,9 +114,10 @@ func ldflags() string {
 	if tag == "" {
 		tag = "dev"
 	}
-	return fmt.Sprintf(`-X "github.com/Mattel/project/proj.timestamp=%s" `+
-		`-X "github.com/Mattel/project/proj.commitHash=%s" `+
-		`-X "github.com/Mattel/project/proj.gitTag=%s"`, timestamp, hash, tag)
+
+	return fmt.Sprintf(`-X "github.com/riboseyim/project/proj.timestamp=%s" `+
+		`-X "github.com/riboseyim/project/proj.commitHash=%s" `+
+		`-X "github.com/riboseyim/project/proj.gitTag=%s"`, timestamp, hash, tag)
 }
 
 // tag returns the git tag for the current branch or "" if none.
@@ -129,4 +130,13 @@ func tag() string {
 func hash() string {
 	hash, _ := sh.Output("git", "rev-parse", "--short", "HEAD")
 	return hash
+}
+
+func envBool(key string) bool {
+	value := os.Getenv(key)
+	if value != "" {
+		return true
+	} else {
+		return false
+	}
 }

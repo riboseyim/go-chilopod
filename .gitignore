@@ -3,3 +3,7 @@ go-childpod
 .DS_Store
 *.csv
 dist/*
+task/*
+vendor/*
+_tools/*
+?/*

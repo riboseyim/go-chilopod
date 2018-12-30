@@ -5,9 +5,18 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 )
+
+func AppendPostfix(filename string, addPostfix string) string {
+	postfix := filename[strings.Index(filename, "."):len(filename)]
+	justname := filename[0:strings.Index(filename, ".")]
+	newfile := justname + addPostfix + postfix
+	log.Println("-----old:%s just:%s addPost:%s newfile %s-----", filename, justname, addPostfix, newfile)
+	return newfile
+}
 
 func ReadLine(fileName string) ([]string, error) {
 	f, err := os.Open(fileName)
@@ -43,7 +52,7 @@ func SaveFile(filename string, data [][]string, append bool) {
 	}
 	defer f.Close()
 
-	//f.WriteString("\xEF\xBB\xBF") // 写入UTF-8 BOM
+	//	f.WriteString("\xEF\xBB\xBF") // 写入UTF-8 BOM
 
 	w := csv.NewWriter(f) //创建一个新的写入文件流
 	w.WriteAll(data)      //写入数据
@@ -62,6 +71,26 @@ func AppendToFile(fileName string, content string) error {
 		n, _ := f.Seek(0, os.SEEK_END)
 		// 从末尾的偏移量开始写入内容
 		_, err = f.WriteAt([]byte(content), n)
+	}
+	defer f.Close()
+	return err
+}
+
+func WriteToFile(fileName string, content []string) error {
+	// 以只写的模式，打开文件
+	os.Remove(fileName)
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Println("%s file create failed. err: %s", fileName, err.Error())
+	} else {
+		// 查找文件末尾的偏移量
+
+		// 从末尾的偏移量开始写入内容
+		for i := 0; i < len(content); i++ {
+			n, _ := f.Seek(0, os.SEEK_END)
+			_, err = f.WriteAt([]byte(content[i]+"\n"), n)
+		}
+
 	}
 	defer f.Close()
 	return err

@@ -7,11 +7,8 @@ import (
 	"log"
 	"os"
 
-	openzipkin "github.com/openzipkin/zipkin-go"
-	"github.com/openzipkin/zipkin-go/reporter/http"
 	chilopod_net "github.com/riboseyim/go-chilopod/network"
 	chilopod_porter "github.com/riboseyim/go-chilopod/porter"
-	"go.opencensus.io/exporter/zipkin"
 	"go.opencensus.io/trace"
 )
 
@@ -48,16 +45,16 @@ func main() {
 	log.Println("task:", *task)
 	log.Println("cfgfile:", *cfgfile)
 
-	zipkinEndPoint, err := openzipkin.NewEndpoint(MODULE, SERVICE)
-	if err != nil {
-		log.Println(err)
-	}
-	reporter := http.NewReporter("http://localhost:9411/api/v2/spans")
-	defer reporter.Close()
-
-	exporter := zipkin.NewExporter(reporter, zipkinEndPoint)
-	trace.RegisterExporter(exporter)
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+	// zipkinEndPoint, err := openzipkin.NewEndpoint(MODULE, SERVICE)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// reporter := http.NewReporter("http://localhost:9411/api/v2/spans")
+	// defer reporter.Close()
+	//
+	// exporter := zipkin.NewExporter(reporter, zipkinEndPoint)
+	// trace.RegisterExporter(exporter)
+	// trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	ctx := context.Background()
 	ctx, handSpan := trace.StartSpan(ctx, "main")
