@@ -7,3 +7,4 @@ task/*
 vendor/*
 _tools/*
 ?/*
+_vendor*/*
