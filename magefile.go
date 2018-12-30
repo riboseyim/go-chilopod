@@ -90,7 +90,7 @@ func Release() (err error) {
 	if os.Getenv("TAG") == "" {
 		return errors.New("TAG environment variable is required")
 	}
-	if err := sh.RunV("git", "tag", "-a", "$TAG"); err != nil {
+	if err := sh.RunV("git", "tag", "-a", "$TAG", "-m", "add tag $TAG by mage tools"); err != nil {
 		return err
 	}
 	if err := sh.RunV("git", "push", "origin", "$TAG"); err != nil {
@@ -103,7 +103,7 @@ func Release() (err error) {
 			sh.RunV("git", "push", "--delete", "origin", "$TAG")
 		}
 	}()
-	return sh.RunV("goreleaser", "release", "--skip-publish")
+	return sh.RunV("goreleaser", "release", "--skip-publish", "--rm-dist")
 	//return retool("goreleaser")
 }
 
